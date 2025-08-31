@@ -1,0 +1,4 @@
+export const transparentPixel = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAukB9Wz9xTwAAAAASUVORK5CYII=",
+  "base64"
+);
