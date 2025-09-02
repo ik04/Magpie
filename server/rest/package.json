@@ -4,15 +4,22 @@
   "description": "",
   "main": "init.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "build": "",
+    "start": ""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@supabase/supabase-js": "^2.56.1",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "supabase": "^2.39.2"
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

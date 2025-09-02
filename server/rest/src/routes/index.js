@@ -1,6 +1,7 @@
 import { Router } from "express";
-import trackRoutes from "./track.js";
+import userRoutes from "./user.js";
 
 const router = Router();
-router.use("/", trackRoutes);
+router.use("/user", userRoutes);
+
 export default router;
