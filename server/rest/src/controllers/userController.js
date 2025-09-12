@@ -2,8 +2,6 @@ import { google } from "googleapis";
 import { supabase } from "../config/supabase.js";
 
 export async function getGmailAuthUrl(req, res) {
-  console.log(`${process.env.API_URL}/auth/gmail/callback`);
-
   try {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GMAIL_CLIENT_ID,
@@ -11,9 +9,10 @@ export async function getGmailAuthUrl(req, res) {
       `${process.env.API_URL}/auth/gmail/consent/callback`
     );
 
+    // * send not needed, will get the threadId from the frontend
     const scopes = [
       "https://www.googleapis.com/auth/gmail.readonly",
-      "https://www.googleapis.com/auth/gmail.send",
+      // "https://www.googleapis.com/auth/gmail.send",
       "https://www.googleapis.com/auth/userinfo.email",
     ];
 
@@ -42,9 +41,10 @@ export async function gmailCallback(req, res) {
     );
 
     const { tokens } = await oauth2Client.getToken(code);
+
     const { access_token, refresh_token, expiry_date, scope } = tokens;
 
-    await supabase.from("user_providers").upsert(
+    const { error } = await supabase.from("user_providers").upsert(
       {
         user_id: userId,
         provider: "gmail",
@@ -56,6 +56,13 @@ export async function gmailCallback(req, res) {
       },
       { onConflict: "user_id,provider" }
     );
+
+    if (error) {
+      console.error("Error saving Gmail tokens to database:", error);
+      return res
+        .status(500)
+        .json({ error: "Failed to save Gmail credentials" });
+    }
 
     res.redirect(`${process.env.FRONTEND_URL}/integrations?success=gmail`);
   } catch (err) {
