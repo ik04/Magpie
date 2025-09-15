@@ -19,7 +19,6 @@ export const fetchMessageId = async (req, res) => {
   if (error || !data) {
     return res.status(400).json({ error: "No Gmail provider linked" });
   }
-  console.log(data);
 
   const message = await getLatestMessage(threadId, data.access_token);
   res.json(message);
@@ -31,18 +30,32 @@ const getLatestMessage = async (threadId, accessToken) => {
 
   const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
-  const thread = await gmail.users.threads.get({
+  const res = await gmail.users.messages.list({
     userId: "me",
-    id: threadId,
+    threadId,
+    maxResults: 1,
   });
 
-  const messages = thread.data.messages || [];
-  const lastMessage = messages[messages.length - 1];
+  const messages = res.data.messages || [];
+  if (messages.length === 0) {
+    throw new Error("No messages found in thread");
+  }
+
+  const latestMessageId = messages[0].id;
+
+  const messageRes = await gmail.users.messages.get({
+    userId: "me",
+    id: latestMessageId,
+    format: "metadata",
+    metadataHeaders: ["From", "To", "Subject", "Date"],
+  });
+
+  const message = messageRes.data;
 
   return {
-    messageId: lastMessage.id,
-    threadId: thread.data.id,
-    snippet: lastMessage.snippet,
-    headers: lastMessage.payload.headers,
+    messageId: message.id,
+    threadId: message.threadId,
+    snippet: message.snippet,
+    headers: message.payload.headers,
   };
 };
