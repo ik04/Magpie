@@ -4,7 +4,6 @@ import {
   getGmailAuthUrl,
   gmailCallback,
 } from "../controllers/userController.js";
-import { supabase } from "../config/supabase.js";
 const router = Router();
 
 router.get("/test", requireAuth, async (req, res) => {
